@@ -6,8 +6,8 @@ from time import gmtime, strftime
 import os
 
 step1_input = "../ExperianBrands.csv"
-step2_input = ["../53cbc1602b0eeafd.csv", "../6006061aba57f4d8.csv", "../d28b35bfbf5b2aa9.csv"]
-step2_input = ["../6006061aba57f4d8_nonul.csv"]
+step2_input = ["../53cbc1602b0eeafd.csv", "../6006061aba57f4d8_nonul.csv", "../d28b35bfbf5b2aa9_nonul.csv"]
+step2_input = ["../53cbc1602b0eeafd.csv", "../6006061aba57f4d8_nonul.csv"]
 step1_output = "output_OneViewSimmons.csv"
 step2_output = "output_ComScore-click.csv"
 step3_output = "output_ComScore-purch.csv"
@@ -26,8 +26,7 @@ def main():
         retl.append(cndi_lib.step2(step2_input, step2_output))
 
     if '3' in arg_vals or 'all' in arg_vals :
-        print "###Step 3:"
-        retl.append(0)
+        retl.append(cndi_lib.step3(step2_input, step3_output))
 
 if __name__ == "__main__":
     
@@ -38,6 +37,6 @@ if __name__ == "__main__":
     if 1 in retl:
         print """
 !!!
-!!!Errors detected. Check aove log or logfile for details.
+!!!Errors detected. Check above log or logfile for details.
 !!!"""
     print "\nDebug log: '{}'\n".format(os.path.join(LOG_FILE_PATH, LOG_FILE))

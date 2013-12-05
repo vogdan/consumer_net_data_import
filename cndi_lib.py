@@ -80,10 +80,8 @@ def step2(step2_input, step2_output):
             header_last = len(header) - 1
             start_pop_dict = clock()
             try: 
-#                info = list(set([(row[0], row[header_last]) for row in rdr]))    
                 for chunk in gen_chunks(rdr, 10000):
-                    info.extend(list(set([(row[0], row[header_last]) 
-                                          for row in rdr])))
+                    info.extend([(row[0], row[header_last]) for row in chunk])
                     info = list(set(info))
                 for tup in info:
                     info.remove(tup)
@@ -94,15 +92,14 @@ def step2(step2_input, step2_output):
                                 graf[tup[1]][tup2[1]] += 1
                             except KeyError:
                                 graf[tup[1]][tup2[1]] = 1
-            except Exception as e:
+            except csv.Error as e:
                 logger.error("Exception {}: {}".format(type(e), e))
                 logger.error("Check Problems section in readme for known issues.")
                 return 1
             check_time(start2, "Done reading.")
-            check_time(start_pop_dict, "Done generating preliminary link dict..")
-                            
+            
     check_time(start_pop_dict, "Done generating full link dict...")
-
+            
     start_write = clock()
     with open(step2_output, 'w') as out_file:
         for k1 in graf.keys():
@@ -110,4 +107,46 @@ def step2(step2_input, step2_output):
                 out_file.write("{},{},{}\n".format(k1, k2, graf[k1][k2]))
     check_time(start_write, "Done writing output file.")
     check_time(start2, "Done with Step 2.")
+    return 0
+
+
+def step3(step3_input, step3_output):
+    logger.info("###Step 3:")
+    start3 = clock()
+    graf = defaultdict(dict)
+    info = []
+    for input_file in step3_input:
+        start_file=clock()
+        logger.info("Reading input file {}".format(input_file))
+        with open(input_file) as csv_file:
+            rdr = csv.DictReader(csv_file)
+            start_pop_dict = clock()
+            try:
+                for chunk in gen_chunks(rdr, 10000):
+                    info.extend([(row['machine_id'], row['domain_name']) 
+                                 for row in chunk if row['tran_flg'] == '1'])
+                    info = list(set(info))
+                for tup in info:
+                    info.remove(tup)
+                    for tup2 in info:
+                        if tup[0] == tup2[0]:
+                            info.remove(tup2)
+                            try:
+                                graf[tup[1]][tup2[1]] += 1
+                            except KeyError:
+                                graf[tup[1]][tup2[1]] = 1
+            except csv.Error as e:
+                logger.error("Exception {}: {}".format(type(e), e))
+                logger.error("Check Problems section in readme for known issues.")
+                return 1                    
+            check_time(start3, "Done reading.")     
+    check_time(start_pop_dict, "Done generating full link dict...")
+            
+    start_write = clock()
+    with open(step3_output, 'w') as out_file:
+        for k1 in graf.keys():
+            for k2 in graf[k1].keys():
+                out_file.write("{},{},{}\n".format(k1, k2, graf[k1][k2]))
+    check_time(start_write, "Done writing output file.")
+    check_time(start3, "Done with Step 3.") 
     return 0
