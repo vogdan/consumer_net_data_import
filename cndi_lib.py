@@ -17,6 +17,7 @@ def parse_cli_opts():
 def check_time(start, message):
     logger.info(" {}  -> took {}".format(message, clock() - start))
 
+
 def step1(step1_input, step1_output):
     logger.info("###Step 1:")
     graf = defaultdict(dict)
@@ -53,6 +54,7 @@ def step1(step1_input, step1_output):
     check_time(start1, "Step 1 end...")
     return 0
 
+
 def gen_chunks(reader, chunksize=100):
     """ 
     Chunk generator. Take a CSV `reader` and yield
@@ -66,11 +68,13 @@ def gen_chunks(reader, chunksize=100):
         chunk.append(line)
     yield chunk
 
+
 def write_to_file(output_file, graf):
     with open(output_file, 'w') as out_file:
         for k1 in graf.keys():
             for k2 in graf[k1].keys():
                 out_file.write("{},{},{}\n".format(k1, k2, graf[k1][k2]))
+
 
 def process_info(info):
     global graf
@@ -84,9 +88,9 @@ def process_info(info):
                 except KeyError:
                     graf[tup[1]][tup2[1]] = 1
 
+
 def step2(step2_input, step2_output):
     global graf
-
     logger.info("###Step 2:")
     graf = defaultdict(dict)
     start2 = clock()
@@ -116,6 +120,7 @@ def step2(step2_input, step2_output):
     return 0
 
 def step3(step3_input, step3_output):
+    global graf
     logger.info("###Step 3:")
     start3 = clock()
     graf = defaultdict(dict)
@@ -138,7 +143,6 @@ def step3(step3_input, step3_output):
                 return 1                    
             check_time(start_file, "Done reading.")     
     check_time(start_file, "Done generating full link dict...")
-            
     start_write = clock()
     write_to_file(step3_output, graf)
     check_time(start_write, "Done writing output file.")
