@@ -25,7 +25,8 @@ The three data sets are:
 Eventually, we want to plot these networks using Gephi (a free publicly available graphing software—download and install it), but need to format the data in an acceptable format for this program. The format is something called an edge list.  Your scripts should create edge lists of brands for each of the three files. 
 
 The end result for each of the three files, should be in the following format:
-```BrandNamei, BrandNamej, n```
+
+     BrandNamei, BrandNamej, n
  - Where the BrandNames are two different brands, i,j, and n is the number of people that connect the two brands. 
 There is a filename BrandWebsites.csv that makes the mapping between brandnames in dataset one and the brandnames in datasets 2 and 3.   
 
@@ -35,3 +36,13 @@ Deliverables:
  - 1) you should provide a script/scripts that take in as input files in the format of 1, 2, and 3 filetypes above and spit out the comma separated edge list.  The script(s) should be documented and tested against the data.
  - 2) You should deliver three edge list files
  - 3) you should plot the three network plots in Gephi to show that the resulting files with the current data works.  Provide 3 plots – one for each data set.
+ 
+
+
+####Problems:
+
+ - NUL (```\000```) bytes error while reading from csv file (maybe because input file is encoded in utf-16 instead of utf-8)
+
+   Solution: use ```tr``` to remove NUL bytes from file:
+   
+                tr < 6006061aba57f4d8.csv -d '\000' > 6006061aba57f4d8_nonul.csv
