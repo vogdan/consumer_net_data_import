@@ -1,4 +1,4 @@
-from csv import reader
+import csv
 from collections import defaultdict
 from time import clock
 from argparse import ArgumentParser
@@ -21,8 +21,8 @@ def step1(step1_input, step1_output):
     logger.info("###Step 1:")
     graf = defaultdict(dict)
     start1 = clock()
-    with open(step1_input, 'rb') as csv_file:
-        rdr = reader(csv_file)
+    with open(step1_input, encoding='utf8', mode='rb') as csv_file:
+        rdr = csv.reader(csv_file)
         check_time(start1, "Reading input file...")
         header = rdr.next()
         start_gather = clock()
@@ -53,35 +53,52 @@ def step1(step1_input, step1_output):
     check_time(start1, "Step 1 end...")
     return 0
 
+def gen_chunks(reader, chunksize=100):
+    """ 
+    Chunk generator. Take a CSV `reader` and yield
+    `chunksize` sized slices. 
+    """
+    chunk = []
+    for i, line in enumerate(reader):
+        if (i % chunksize == 0 and i > 0):
+            yield chunk
+            del chunk[:]
+        chunk.append(line)
+    yield chunk
+
 def step2(step2_input, step2_output):
     logger.info("###Step 2:")
     start2 = clock()
     graf = defaultdict(dict)
-
+    info = []
     for input_file in step2_input:
         start_file=clock()
         logger.info("Reading input file {}".format(input_file))
-        with open(input_file, 'rb') as csv_file:
-            rdr = reader(csv_file)
+        with open(input_file) as csv_file:
+            rdr = csv.reader(csv_file)
             header = rdr.next()
             header_last = len(header) - 1
+            start_pop_dict = clock()
             try: 
-                info = list(set([(row[0], row[header_last]) for row in rdr]))    
+#                info = list(set([(row[0], row[header_last]) for row in rdr]))    
+                for chunk in gen_chunks(rdr, 10000):
+                    info.extend(list(set([(row[0], row[header_last]) 
+                                          for row in rdr])))
+                    info = list(set(info))
+                for tup in info:
+                    info.remove(tup)
+                    for tup2 in info:
+                        if tup[0] == tup2[0]:
+                            info.remove(tup2)
+                            try:
+                                graf[tup[1]][tup2[1]] += 1
+                            except KeyError:
+                                graf[tup[1]][tup2[1]] = 1
             except Exception as e:
                 logger.error("Exception {}: {}".format(type(e), e))
                 logger.error("Check Problems section in readme for known issues.")
                 return 1
             check_time(start2, "Done reading.")
-            start_pop_dict = clock()
-            for tup in info:
-                info.remove(tup)
-                for tup2 in info:
-                    if tup[0] == tup2[0]:
-                        info.remove(tup2)
-                        try:
-                            graf[tup[1]][tup2[1]] += 1
-                        except KeyError:
-                            graf[tup[1]][tup2[1]] = 1
             check_time(start_pop_dict, "Done generating preliminary link dict..")
                             
     check_time(start_pop_dict, "Done generating full link dict...")
