@@ -1,7 +1,22 @@
 consumer_net_data_import
 ========================
 
+####Description
+
 Parse consumer info CSV files and output three edge lists that can be plotted in Gepi.
+
+####Synopsis
+
+          usage: cndi.py [-h] -s STEP_TO_RUN
+          Create consumer networks
+          Arguments:
+             -h, --help            show this help message and exit
+             -s STEP_TO_RUN, --step_to_run STEP_TO_RUN
+                        Step to run: all or "1", "2", "3", "1,2", etc.
+
+
+
+####Detailed description
 
 The objective of this test is create 3 different “networks” in order to compare how consumers’ behaviors are reflected by 3 different data sets. The resulting networks will have nodes that each represent a distinct brand and the link (weight) between these nodes will indicate that there is at least one person who uses/interacts with both of these brands. The strength of the link will reflect the number of people connecting the brands.  
 
