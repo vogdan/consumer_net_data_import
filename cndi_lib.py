@@ -22,7 +22,7 @@ def step1(step1_input, step1_output):
     logger.info("###Step 1:")
     graf = defaultdict(dict)
     start1 = clock()
-    with open(step1_input, encoding='utf8', mode='rb') as csv_file:
+    with open(step1_input, 'rb') as csv_file:
         rdr = csv.reader(csv_file)
         check_time(start1, "Reading input file...")
         header = rdr.next()
