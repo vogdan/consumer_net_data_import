@@ -51,7 +51,8 @@ Deliverables:
  - 1) you should provide a script/scripts that take in as input files in the format of 1, 2, and 3 filetypes above and spit out the comma separated edge list.  The script(s) should be documented and tested against the data.
  - 2) You should deliver three edge list files
  - 3) you should plot the three network plots in Gephi to show that the resulting files with the current data works.  Provide 3 plots – one for each data set.
- 
+
+Data sets can be found [here](https://www.dropbox.com/sh/c9lh99fr6l4psgm/2rh6lpLZrC). 
 
 
 ####Problems:
