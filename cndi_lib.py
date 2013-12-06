@@ -15,10 +15,27 @@ def parse_cli_opts():
 
 
 def check_time(start, message):
+    """
+    Function used to time the running various parts of code
+
+    :input: start - return of time.clock() (run at beginning of action to be timed)
+            message - message describing the action that is timed
+    :return: nothing (only writes a message to log and console)        
+    """
+
     logger.info(" {}  -> took {}".format(message, clock() - start))
 
 
 def step1(step1_input, step1_output):
+    """
+    Handle the Step1 requests (OneView Simmons Data) - check README for details
+
+    :input: step1_input - input file for step 1
+            step1_output - output file for step 1
+    :return: 0 on success
+             1 on error
+    """
+
     logger.info("###Step 1:")
     graf = defaultdict(dict)
     start1 = clock()
@@ -38,7 +55,6 @@ def step1(step1_input, step1_output):
                     except:
                         graf[header[pos]][header[other_pos]] = 1
         check_time(start_gather, "Done gathering data...")
-
     start_output = clock()
     with open(step1_output, 'w') as out_file:
         for entry in header[1:]:
@@ -49,7 +65,6 @@ def step1(step1_input, step1_output):
                                                        graf[entry][entry2]))
                 except KeyError:
                     out_file.write("{},{},{}\n".format(entry, entry2, 0))
-
     check_time(start_output, "Done writing output file...")
     check_time(start1, "Step 1 end...")
     return 0
@@ -57,9 +72,18 @@ def step1(step1_input, step1_output):
 
 def gen_chunks(reader, chunksize=100):
     """ 
-    Chunk generator. Take a CSV `reader` and yield
-    `chunksize` sized slices. 
+    Chunk generator. 
+
+    :input: reader - CSV reader (as returned by csv.reader)
+            chunksize - number of lines in the chunk
+    :return: Chunk of `chunksize` lines
+    :calling example:
+            with open(input_file) as csv_file:
+                rdr = csv.reader(csv_file)
+                for chunk in gen_chunks(rdr, 10000):
+                    process chunk
     """
+
     chunk = []
     for i, line in enumerate(reader):
         if (i % chunksize == 0 and i > 0):
@@ -70,6 +94,17 @@ def gen_chunks(reader, chunksize=100):
 
 
 def write_to_file(output_file, graf):
+    """
+    Write a graph dictionary (as produced by step2 and step3 functions) to file.
+    Lines will have the following format: 
+                        key1, key2, info
+
+    :input: output_file - file to write to
+            graf - 2d dictionary containing edge informations (keys are nodes 
+                   and info is the edge weight)
+    :return: nothing (just writes the file)
+    """
+
     with open(output_file, 'w') as out_file:
         for k1 in graf.keys():
             for k2 in graf[k1].keys():
@@ -77,6 +112,16 @@ def write_to_file(output_file, graf):
 
 
 def process_info(info):
+    """
+    Populates the graph dictionary with edge list info
+
+    :input: a list of tuples representing useful information for determining
+            edges and edge weights (unique entries for first and last column in data set for
+            step2 and the same for step3 with the condition that the 'tran_flg' column value
+            is 1)
+    :return: nothing      
+    """
+
     global graf
     for tup in info:
         info.remove(tup)
@@ -90,6 +135,15 @@ def process_info(info):
 
 
 def step2(step2_input, step2_output):
+    """
+    Handle the Step2 requests (comScore click-through) - check README for details
+
+    :input: step2_input - list containing input files 
+            step2_output - output file
+    :return: 0 on success
+             1 on error
+    """
+
     global graf
     logger.info("###Step 2:")
     graf = defaultdict(dict)
@@ -119,7 +173,17 @@ def step2(step2_input, step2_output):
     check_time(start2, "Done with Step 2.")
     return 0
 
+
 def step3(step3_input, step3_output):
+    """
+    Handle the Step3 requests (comScore purchase) - check README for details
+
+    :input: step3_input - list containing input files 
+            step3_output - output file
+    :return: 0 on success
+             1 on error
+    """
+
     global graf
     logger.info("###Step 3:")
     start3 = clock()
