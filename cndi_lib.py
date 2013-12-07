@@ -4,6 +4,7 @@ from time import clock
 from argparse import ArgumentParser
 from sets import Set
 from cndi_logging import logger
+import re
 
 
 def parse_cli_opts():
@@ -26,18 +27,28 @@ def check_time(start, message):
     logger.info(" {}  -> took {}".format(message, clock() - start))
 
 
-def step1(step1_input, step1_output):
+def step1(step1_input, step1_output, map_file):
     """
     Handle the Step1 requests (OneView Simmons Data) - check README for details
 
     :input: step1_input - input file for step 1
             step1_output - output file for step 1
+            map_file - file that maps brands with brand websites
     :return: 0 on success
              1 on error
     """
 
     logger.info("###Step 1:")
     graf = defaultdict(dict)
+    start = clock()
+    #create brands-website map dictionsry
+    website_map = {}
+    with open(map_file) as csv_file:
+        rdr = csv.DictReader(csv_file)
+        for row in rdr:
+             website_map[re.sub('[.,;:]', '', row['BrandName'])] = row['Website'] 
+    check_time(start, "populate website_map")
+    #gather graph data 
     start1 = clock()
     with open(step1_input, 'rb') as csv_file:
         rdr = csv.reader(csv_file)
@@ -48,24 +59,24 @@ def step1(step1_input, step1_output):
             one_list = [i for i,x in enumerate(row) if x == '1']
             for pos in one_list:
                 pos_idx = one_list.index(pos)
+                try:
+                    site = website_map[header[pos_idx]]
+                except KeyError:
+                    site = header[pos_idx]
                 for other_pos in one_list[pos_idx+1:]:
                     other_pos_idx = one_list.index(other_pos)
                     try:
-                        graf[header[pos]][header[other_pos]] += 1
-                    except:
-                        graf[header[pos]][header[other_pos]] = 1
+                        other_site = website_map[header[other_pos_idx]]
+                    except KeyError:
+                        other_site = header[other_pos_idx]
+                    try:
+                        graf[site][other_site] += 1
+                    except KeyError:
+                        graf[site][other_site] = 1
         check_time(start_gather, "Done gathering data...")
-    start_output = clock()
-    with open(step1_output, 'w') as out_file:
-        for entry in header[1:]:
-            idx = header.index(entry)
-            for entry2 in header[idx+1:]:
-                try:
-                    out_file.write("{},{},{}\n".format(entry, entry2, 
-                                                       graf[entry][entry2]))
-                except KeyError:
-                    out_file.write("{},{},{}\n".format(entry, entry2, 0))
-    check_time(start_output, "Done writing output file...")
+    start_write = clock()
+    write_to_file(step1_output, graf)
+    check_time(start_write, "Done writing output file.")
     check_time(start1, "Step 1 end...")
     return 0
 
