@@ -8,7 +8,6 @@ import os
 map_file = "../BrandWebsites.csv"
 step1_input = "../ExperianBrands.csv"
 step2_input = ["../53cbc1602b0eeafd.csv", "../6006061aba57f4d8_nonul.csv", "../d28b35bfbf5b2aa9_nonul.csv"]
-step2_input = ["../53cbc1602b0eeafd.csv"]
 step1_output = "output_OneViewSimmons.csv"
 step2_output = "output_ComScore-click.csv"
 step3_output = "output_ComScore-purch.csv"

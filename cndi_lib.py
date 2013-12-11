@@ -2,7 +2,6 @@ import csv
 from collections import defaultdict
 from time import clock
 from argparse import ArgumentParser
-from sets import Set
 from cndi_logging import logger
 import re
 
@@ -142,7 +141,10 @@ def process_info(info):
                 try:
                     graf[tup[1]][tup2[1]] += 1
                 except KeyError:
-                    graf[tup[1]][tup2[1]] = 1
+                    try: 
+                        graf[tup2[1]][tup[1]] += 1
+                    except KeyError:
+                        graf[tup[1]][tup2[1]] = 1
 
 
 def step2(step2_input, step2_output):
